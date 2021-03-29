@@ -28,11 +28,11 @@ public class ArrayManager{
             int count = 1;
             int startLoc = hash(item.weaponName);
             int loc = startLoc;
-            while(table[loc] != null && table[loc].item.weaponName != "DELETED"){
+            while(table[loc] != null && table[loc].item.weaponName.compareTo("DELETED")!=0){
                 loc = (startLoc + count*count)%maxItems;
                 count++;
             }
-            if(table[loc].item.weaponName == item.weaponName){
+            if(table[loc] != null && table[loc].item.weaponName == item.weaponName){
                 table[loc].numOfStock++;
             }
             else{
