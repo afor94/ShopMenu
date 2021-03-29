@@ -1,6 +1,7 @@
 import java.util.Scanner;
 
 public class ShopMenu {
+
     public static int getInteger(Scanner sc,String message){
         System.out.print(message);
         while (!sc.hasNextInt())
@@ -22,12 +23,12 @@ public class ShopMenu {
     }
 
 
-    public static void addWeapons(ArrayManager h,Scanner sc)
+    public static void addWeapons(ArrayManager h,Scanner sc,Player pl)
     {
         System.out.println("***********WELCOME TO THE WEAPON ADDING MENU*********");
-        String weaponName; int weaponRange; int weaponDamage; double weaponWeight; double weaponCost;
+        String weaponName, session; int weaponRange; int weaponDamage; double weaponWeight; double weaponCost;
         int quantity;
-        System.out.print("Please enter the NAME of the Weapon ('end' to quit):");
+        System.out.print("Please enter the NAME of the Weapon):");
         weaponName=sc.next();
         while (weaponName.compareTo("end") != 0)
         {
@@ -38,26 +39,78 @@ public class ShopMenu {
             Weapon w = new Weapon(weaponName, weaponRange, weaponDamage, weaponWeight, weaponCost);
             quantity=getInteger(sc,"Please enter the quantity in stock:");
             h.put(w,quantity);
-            System.out.print("Please enter the NAME of another Weapon ('end' to quit):");
-            weaponName = sc.next();
+            System.out.println("Weapon Added!");
+            System.out.print("Please enter a character to return to the shop menu\n");
+            session=sc.nextLine();
+            showRoomMenu(h,pl,sc);
+
+
         }
     }
 
+    public static void viewBackpack(Player p,ArrayManager h,Scanner sc){
+        String session;
+        System.out.println("Backpack:");
+        h.printTable();
+        System.out.print("Please enter a character to return to the shop menu");
+        session=sc.next();
+        showRoom(h, p,sc);
+
+    }
+
+    public static void viewPlayer(Player p,ArrayManager h,Scanner sc){
+        String session;
+        System.out.println("Name:" +p.name + "\nMoney:" + p.money + "\nWeapons:");
+        h.printTable();
+        System.out.print("Please enter a character to return to the shop menu");
+        session=sc.next();
+        showRoom(h, p,sc);
 
 
-    public static void showRoomMenu(ArrayManager ht,Player p){
+    }
+    public static void exit(){
+        System.out.println("Exiting program...");
+        System.exit(0);
+    }
+
+    public static void showRoomMenu(ArrayManager ht,Player p,Scanner sc){
         System.out.println("WELCOME TO THE SHOWROOM!!!!");
-        ht.printTable();
-        System.out.println("You have "+p.money+" money.");
-        System.out.println("Please select a weapon to buy('end' to quit):");
+        System.out.println("You have "+p.money+" coins.");
+        System.out.println("1) Add items to shop");
+        System.out.println("2) Delete items from shop");
+        System.out.println("3) Buy items  from Shop");
+        System.out.println("4) View Backpack");
+        System.out.println("5) View Player");
+        System.out.println("6) Exit");
+
+        int choice=sc.nextInt();
+        while (choice != 0 && !p.inventoryFull())
+        {
+            switch(choice){
+                case 1:  addWeapons(ht,sc,p);
+                    break;
+                case 2:  exit();
+                    break;
+                case 3:  showRoom(ht,p,sc);
+                    break;
+                case 4:  viewBackpack(p,ht,sc);
+                    break;
+                case 5:  viewPlayer(p,ht,sc);
+                    break;
+                case 6:  exit();
+
+            }
+
+        }
+
     }
 
     public static void showRoom(ArrayManager ht, Player p,Scanner sc)
     {
-        String choice;
-        showRoomMenu(ht,p);
+        String choice,session;
+        ht.printTable();
         choice=sc.next();
-        while (choice.compareTo("end") != 0 && !p.inventoryFull())
+        while ( !p.inventoryFull())
         {
             ShopItem si = ht.get(choice);
             if (si != null)
@@ -65,18 +118,17 @@ public class ShopMenu {
 
                 p.buy(si.item);
                 p.withdraw(si.item.cost);
-                si.numberInStock--;
+                si.numOfStock--;
 
             }
-            else
-            {
-                System.out.println(" ** "+choice+" not found!! **" );
-            }
-            showRoomMenu(ht,p);
+
+            showRoomMenu(ht,p,sc);
             choice = sc.next();
         }
         System.out.println("");
+        showRoomMenu(ht,p,sc);
     }
+
 
     public static void main(String[] args)
     {
@@ -86,12 +138,14 @@ public class ShopMenu {
         pname=sc.next();
         Player pl= new Player(pname,45);
         ArrayManager ht= new ArrayManager(101);
-        addWeapons(ht,sc);
-        showRoom(ht, pl,sc);
+        showRoomMenu(ht, pl,sc);
+        int option = sc.nextInt();
+
+
         pl.printCharacter();
 
-    }
 
+    }
 
 
 }

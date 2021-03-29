@@ -1,9 +1,9 @@
 public class ShopItem {
     Weapon item;
-    int numberInStock;
+    int numOfStock;
 
-    public ShopItem(Weapon w, int nInStock){
-        item=w;
-        numberInStock=nInStock;
+    public ShopItem(Weapon w,int stock){
+        this.item = w;
+        this.numOfStock = stock;
     }
 }
