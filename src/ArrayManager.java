@@ -15,7 +15,7 @@ public class ArrayManager{
         int value=0;
         int weight=1;
 
-        for(int x = 0; x<maxItems;x++){
+        for(int x = 0; x<name.length();x++){
             value += (name.charAt(x)-'a'+1)*weight;
             weight++;
         }
