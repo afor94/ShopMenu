@@ -1,5 +1,5 @@
-public class ArrayManager{
-    private ShopItem[] table;
+public class ArrayManager {
+    private Item[] table;
     private int maxItems;
     private int numItems;
     private double loadFactor;
@@ -7,7 +7,7 @@ public class ArrayManager{
     public ArrayManager(int size){
         maxItems = size;
         numItems = 0;
-        table = new ShopItem[maxItems];
+        table = new Item[maxItems];
         loadFactor = 0.75;
     }
 
@@ -22,32 +22,28 @@ public class ArrayManager{
         return value%maxItems;
     }
 
-    public void put(Weapon item, int quantity){
-
+    public boolean addItem(Weapon w, int q){
         if(numItems/maxItems < loadFactor){
             int count = 1;
-            int startLoc = hash(item.weaponName);
+            int startLoc = hash(w.weaponName);
             int loc = startLoc;
-            while(table[loc] != null && table[loc].item.weaponName.compareTo("DELETED")!=0){
+            while(table[loc] != null && table[loc].weapon.weaponName.compareTo("DELETED")!=0){
                 loc = (startLoc + count*count)%maxItems;
                 count++;
             }
-            if(table[loc] != null && table[loc].item.weaponName == item.weaponName){
-                table[loc].numOfStock++;
-            }
-            else{
-                table[loc]= new ShopItem(item, quantity);
-            }
-            numItems++;
+            table[loc] = new Item(w, q);
+            numItems += q;
+            return true;
         }
+        return false;
     }
 
-    public ShopItem get(String key){
+    public Item get(String key){
         int count = 1;
         int startLoc = hash(key);
         int loc = startLoc;
 
-        while(table[loc] != null && key.compareTo(table[loc].item.weaponName) !=0)
+        while(table[loc] != null && key.compareTo(table[loc].weapon.weaponName) !=0)
         {
             loc = (startLoc + count*count)%maxItems;
             count++;
@@ -58,27 +54,42 @@ public class ArrayManager{
         return null;
     }
 
-    public void delete(String key){
+    public boolean removeItem(Weapon w, int quantity){
         int count = 1;
-        int startLoc = hash(key);
+        int startLoc = hash(w.weaponName);
         int loc = startLoc;
 
-        while(table[loc] != null && key.compareTo(table[loc].item.weaponName) !=0)
-        {
-            loc = (startLoc + count*count)%maxItems;
+        while(table[loc] != null && w.weaponName.compareTo(table[loc].weapon.weaponName) != 0){
+            loc = (startLoc + count * count)%maxItems;
             count++;
         }
         if(table[loc]!=null){
-            table[loc].item.weaponName = "DELETED";
-            numItems--;
+            if(table[loc].quantity > quantity){
+                table[loc].decreaseQuantity(quantity);
+            }
+            table[loc].weapon.weaponName = "DELETED";
+            numItems-=quantity;
+            return true;
         }
-
+        return false;
     }
 
+
     public void printTable(){
-        for (int x = 0; x < numItems; x++)
+        System.out.println("Items in stock:");
+        for (int x = 0; x < maxItems; x++)
         {
-            System.out.println("Name: " +table[x].item.weaponName+"   Damage:"+table[x].item.damage+"    Cost:"+table[x].item.cost+"     Quantity in stock:"+table[x].numOfStock);
+            if(table[x]!=null && table[x].quantity != 0){
+                System.out.println("Name: " +table[x].weapon.weaponName+"   Damage:"+table[x].weapon.damage+"    Cost:"+table[x].weapon.cost+"     Quantity in stock:"+table[x].quantity);
+            }
+        }
+    }
+    public void printBackpack(){
+        for (int x = 0; x < maxItems; x++)
+        {
+            if(table[x]!=null && table[x].quantity != 0){
+                System.out.println("Name: " +table[x].weapon.weaponName+"   Damage:"+table[x].weapon.damage+"    Quantity in backpack:"+table[x].quantity);
+            }
         }
     }
 
